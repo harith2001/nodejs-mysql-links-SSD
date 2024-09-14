@@ -10,6 +10,7 @@ import expressMySQLSession from "express-mysql-session";
 import { promiseConnectFlash } from "async-connect-flash";
 
 import { fileURLToPath } from "url";
+import helmet from 'helmet';
 
 import routes from "./routes/index.js";
 import "./lib/passport.js";
@@ -33,6 +34,22 @@ app.engine(
   }).engine
 );
 app.set("view engine", ".hbs");
+
+// Set CSP using helmet
+app.use(helmet.contentSecurityPolicy({
+  directives: {
+    defaultSrc: ["'self'"], 
+    scriptSrc: ["'self'"],  
+    imgSrc: ["'self'", "data:"],  
+    connectSrc: ["'self'"],  
+    frameAncestors: ["'none'"],  
+    objectSrc: ["'none'"],  
+    upgradeInsecureRequests: [],
+  }
+}));
+
+// Set X-Frame-Options
+app.use(helmet.frameguard({ action: 'deny' }));
 
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
@@ -76,5 +93,6 @@ app.use((err, req, res, next) => {
     status: err.status,
   });
 });
+
 
 export default app;
