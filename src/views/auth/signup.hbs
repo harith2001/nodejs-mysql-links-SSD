@@ -4,6 +4,8 @@
       <form class="card card-body bg-dark text-white p-5" action="/signup" method="POST">
         <h3 class="text-center fw-bold mb-4">SignUp</h3>
 
+        <input type="hidden" name="_csrf" value="{{csrfToken}}" />
+
         <label for="fullname">Write your fullname:</label>
         <input type="type" name="fullname" placeholder="John Doe" class="form-control mb-3" autofocus />
 
