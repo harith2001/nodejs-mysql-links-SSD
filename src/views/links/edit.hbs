@@ -4,6 +4,7 @@
       <div class="card bg-dark border border-dark">
         <div class="card-body">
           <form action="/links/edit/{{link.id}}" method="POST">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}" />
             <div class="form-group">
               <input
                 type="text"
