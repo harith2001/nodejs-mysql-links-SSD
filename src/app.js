@@ -66,8 +66,18 @@ app.use(
       imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
       connectSrc: ["'self'"],
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
+      upgradeInsecureRequests: [true],// Automatically upgrade HTTP to HTTPS
     },
+    reportOnly: false, // Set to false to enforce the policy
+  })
+);
+
+// Set HSTS with helmet (Strict-Transport-Security)
+app.use(
+  helmet.hsts({
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true, // Apply to all subdomains
+    preload: true, // Allow domain to be preloaded by browsers
   })
 );
 
