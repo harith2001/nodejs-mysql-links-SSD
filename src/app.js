@@ -9,8 +9,8 @@ import session from "express-session";
 import expressMySQLSession from "express-mysql-session";
 import { promiseConnectFlash } from "async-connect-flash";
 import { fileURLToPath } from "url";
-import helmet from 'helmet';
-import cors from 'cors';
+import helmet from "helmet";
+import cors from "cors";
 import routes from "./routes/index.js";
 import "./lib/passport.js";
 import * as helpers from "./lib/handlebars.js";
@@ -41,6 +41,7 @@ const corsOptions = {
   origin: "http://localhost:4000",
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization, X-CSRF-Token",
+  credentials: true,
 };
 // Set CSP using helmet
 app.use(helmet({
@@ -98,8 +99,8 @@ app.use(
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // secure only in production
-    }
+      secure: process.env.NODE_ENV === "production", // secure only in production
+    },
   })
 );
 
@@ -128,6 +129,9 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // Global variables middleware
 app.use(async (req, res, next) => {
+  res.locals.success = await req.getFlash("success");
+  res.locals.error = await req.getFlash("error");
+  res.locals.user = req.user;
   res.locals.success = await req.getFlash("success");
   res.locals.error = await req.getFlash("error");
   res.locals.user = req.user;
@@ -163,5 +167,4 @@ app.use((err, req, res, next) => {
     status: err.status,
   });
 });
-
 export default app;
