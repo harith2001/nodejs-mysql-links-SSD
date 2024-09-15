@@ -88,8 +88,8 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production", 
-      maxAge: 1000 * 60 * 60 * 24,
-      sameSite: 'strict'
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: 'strict'// SameSite attribute added for CSRF cookie
     },
   })
 );
