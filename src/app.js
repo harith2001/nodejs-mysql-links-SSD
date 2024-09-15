@@ -41,7 +41,6 @@ const corsOptions = {
   origin: "http://localhost:4000",
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization",
-  credentials: true,
 };
 
 // Middleware configuration
