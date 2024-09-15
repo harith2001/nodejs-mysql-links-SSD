@@ -9,8 +9,8 @@ import session from "express-session";
 import expressMySQLSession from "express-mysql-session";
 import { promiseConnectFlash } from "async-connect-flash";
 import { fileURLToPath } from "url";
-import helmet from 'helmet';
-import cors from 'cors';
+import helmet from "helmet";
+import cors from "cors";
 import routes from "./routes/index.js";
 import "./lib/passport.js";
 import * as helpers from "./lib/handlebars.js";
@@ -38,9 +38,12 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: "http://localhost:4000",
+  origin: [
+    "http://localhost:4000",
+  ],
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization",
+  credentials: true,
 };
 
 // Middleware configuration
@@ -58,8 +61,8 @@ app.use(
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // secure only in production
-    }
+      secure: process.env.NODE_ENV === "production", // secure only in production
+    },
   })
 );
 
@@ -75,7 +78,34 @@ app.use((req, res, next) => {
 
 // Security middleware
 app.use(cors(corsOptions));
-app.use(helmet()); // Using default helmet protections
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net", // Allow JS from jsdelivr CDN
+      ],
+      styleSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net", // Allow CSS from jsdelivr CDN (Bootstrap)
+        "https://use.fontawesome.com", // Allow CSS from FontAwesome
+        "https://fonts.googleapis.com", // Allow CSS from Google Fonts
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // Allow fonts from Google Fonts
+        "https://use.fontawesome.com", // Allow fonts from FontAwesome
+      ],
+      imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [],
+    },
+  })
+);
+
+
 
 // Passport initialization
 app.use(passport.initialize());
