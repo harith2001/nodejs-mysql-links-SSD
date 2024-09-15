@@ -38,39 +38,51 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: "http://localhost:4000", // Allow only the specified origin
+  origin: "http://localhost:4000",
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization, X-CSRF-Token",
   credentials: true,
 };
 // Set CSP using helmet
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net", // Allow JS from jsdelivr CDN
-      ],
-      styleSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net", // Allow CSS from jsdelivr CDN (Bootstrap)
-        "https://use.fontawesome.com", // Allow CSS from FontAwesome
-        "https://fonts.googleapis.com", // Allow CSS from Google Fonts
-      ],
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com", // Allow fonts from Google Fonts
-        "https://use.fontawesome.com", // Allow fonts from FontAwesome
-      ],
-      imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
-      connectSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  })
-);
-
+app.use(helmet({
+  contentSecurityPolicy:{
+  directives: {
+    defaultSrc: ["'self'"],
+    scriptSrc: [
+      "'self'", 
+      "https://cdn.jsdelivr.net", 
+      "https://use.fontawesome.com"
+    ],
+    styleSrc: [
+      "'self'", 
+      "https://fonts.googleapis.com", 
+      "https://use.fontawesome.com"
+    ],
+    imgSrc: ["'self'", "data:"],
+    connectSrc: [
+      "'self'",
+      "https://localhost:4000",
+      "https://accounts.google.com",
+      "https://update.googleapis.com",
+      "https://content-autofill.googleapis.com",
+      "https://optimizationguide-pa.googleapis.com"
+    ],
+    frameAncestors: ["'none'"],
+    objectSrc: ["'none'"],
+    fontSrc: [
+      "'self'", 
+      "https://fonts.gstatic.com", 
+      "https://fonts.googleapis.com", 
+      "https://use.fontawesome.com"
+    ],
+    upgradeInsecureRequests: [],
+    baseUri: ["'self'"],
+    formAction: ["'self'"],
+    scriptSrcAttr: ["'none'"],
+    styleSrcAttr: ["'none'"] 
+  }
+}
+}));
 
 // Middleware configuration
 app.use(morgan("dev"));
@@ -87,21 +99,13 @@ app.use(
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      maxAge: 1000 * 60 * 60 * 24,
-      sameSite: 'strict'
+      secure: process.env.NODE_ENV === "production", // secure only in production
     },
   })
 );
 
 // CSRF Protection (must come after session middleware)
-const csrfProtection = csurf({
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // Set to true in production
-    sameSite: 'strict',  // SameSite attribute added for CSRF cookie
-  },
-});
+const csrfProtection = csurf({ cookie: true });
 app.use(csrfProtection);
 
 // Middleware to set CSRF token in locals
@@ -135,7 +139,7 @@ app.use(async (req, res, next) => {
 });
 
 // Routes
-app.use('/',routes);
+app.use(routes);
 
 // 404 error handler
 app.use((req, res, next) => {
