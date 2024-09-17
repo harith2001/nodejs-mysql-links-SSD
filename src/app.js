@@ -38,7 +38,11 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: "http://localhost:4000", // Allow only the specified origin
+  origin: ["http://localhost:4000",
+  "https://cdn.jsdelivr.net",
+  "https://fonts.googleapis.com",
+  "https://fonts.gstatic.com",
+  "https://use.fontawesome.com"], // Allow only the specified origin
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization, X-CSRF-Token",
   credentials: true,
@@ -64,7 +68,12 @@ app.use(
         "https://use.fontawesome.com", // Allow fonts from FontAwesome
       ],
       imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
-      connectSrc: ["'self'"],
+      connectSrc: ["'self'",
+      "https://localhost:4000",
+      "https://accounts.google.com",
+      "https://update.googleapis.com",
+      "https://content-autofill.googleapis.com",
+      "https://optimizationguide-pa.googleapis.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [true],// Automatically upgrade HTTP to HTTPS
     },
@@ -81,6 +90,8 @@ app.use(
   })
 );
 
+app.use(helmet.hidePoweredBy());  // Hide X-Powered-By
+app.use(helmet.noSniff());        // X-Content-Type-Options: nosniff
 
 // Middleware configuration
 app.use(morgan("dev"));
@@ -97,7 +108,7 @@ app.use(
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
+      secure: process.env.NODE_ENV === "production",
       maxAge: 1000 * 60 * 60 * 24, // 1 day
       sameSite: 'strict'// SameSite attribute added for CSRF cookie
     },
