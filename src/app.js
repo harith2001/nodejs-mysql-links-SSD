@@ -38,51 +38,60 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: "http://localhost:4000",
+  origin: ["http://localhost:4000",
+  "https://cdn.jsdelivr.net",
+  "https://fonts.googleapis.com",
+  "https://fonts.gstatic.com",
+  "https://use.fontawesome.com"], // Allow only the specified origin
   methods: "GET,PUT,POST,DELETE",
   allowedHeaders: "Content-Type, Authorization, X-CSRF-Token",
   credentials: true,
 };
 // Set CSP using helmet
-app.use(helmet({
-  contentSecurityPolicy:{
-  directives: {
-    defaultSrc: ["'self'"],
-    scriptSrc: [
-      "'self'", 
-      "https://cdn.jsdelivr.net", 
-      "https://use.fontawesome.com"
-    ],
-    styleSrc: [
-      "'self'", 
-      "https://fonts.googleapis.com", 
-      "https://use.fontawesome.com"
-    ],
-    imgSrc: ["'self'", "data:"],
-    connectSrc: [
-      "'self'",
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net", // Allow JS from jsdelivr CDN
+      ],
+      styleSrc: [
+        "'self'",
+        "https://cdn.jsdelivr.net", // Allow CSS from jsdelivr CDN (Bootstrap)
+        "https://use.fontawesome.com", // Allow CSS from FontAwesome
+        "https://fonts.googleapis.com", // Allow CSS from Google Fonts
+      ],
+      fontSrc: [
+        "'self'",
+        "https://fonts.gstatic.com", // Allow fonts from Google Fonts
+        "https://use.fontawesome.com", // Allow fonts from FontAwesome
+      ],
+      imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
+      connectSrc: ["'self'",
       "https://localhost:4000",
       "https://accounts.google.com",
       "https://update.googleapis.com",
       "https://content-autofill.googleapis.com",
-      "https://optimizationguide-pa.googleapis.com"
-    ],
-    frameAncestors: ["'none'"],
-    objectSrc: ["'none'"],
-    fontSrc: [
-      "'self'", 
-      "https://fonts.gstatic.com", 
-      "https://fonts.googleapis.com", 
-      "https://use.fontawesome.com"
-    ],
-    upgradeInsecureRequests: [],
-    baseUri: ["'self'"],
-    formAction: ["'self'"],
-    scriptSrcAttr: ["'none'"],
-    styleSrcAttr: ["'none'"] 
-  }
-}
-}));
+      "https://optimizationguide-pa.googleapis.com"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: [true],// Automatically upgrade HTTP to HTTPS
+    },
+    reportOnly: false, // Set to false to enforce the policy
+  })
+);
+
+// Set HSTS with helmet (Strict-Transport-Security)
+app.use(
+  helmet.hsts({
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true, // Apply to all subdomains
+    preload: true, // Allow domain to be preloaded by browsers
+  })
+);
+
+app.use(helmet.hidePoweredBy());  // Hide X-Powered-By
+app.use(helmet.noSniff());        // X-Content-Type-Options: nosniff
 
 // Middleware configuration
 app.use(morgan("dev"));
@@ -99,13 +108,21 @@ app.use(
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // secure only in production
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 1000 * 60 * 60 * 24, // 1 day
+      sameSite: 'strict'// SameSite attribute added for CSRF cookie
     },
   })
 );
 
 // CSRF Protection (must come after session middleware)
-const csrfProtection = csurf({ cookie: true });
+const csrfProtection = csurf({
+  cookie: {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production', // Set to true in production
+    sameSite: 'strict',  // SameSite attribute added for CSRF cookie
+  },
+});
 app.use(csrfProtection);
 
 // Middleware to set CSRF token in locals
@@ -139,7 +156,7 @@ app.use(async (req, res, next) => {
 });
 
 // Routes
-app.use(routes);
+app.use('/',routes);
 
 // 404 error handler
 app.use((req, res, next) => {
