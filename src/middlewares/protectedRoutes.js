@@ -1,4 +1,6 @@
 export const isLoggedIn = (req, res, next) => {
+  console.log("Session data:", req.session); 
+  console.log("auth",req.isAuthenticated());
   if (!req.isAuthenticated()) return res.redirect("/signin");
   return next();
 };

@@ -4,7 +4,6 @@ import path from "path";
 import { create } from "express-handlebars";
 import passport from "passport";
 import cookieParser from "cookie-parser";
-import flash from "connect-flash";
 import session from "express-session";
 import expressMySQLSession from "express-mysql-session";
 import { promiseConnectFlash } from "async-connect-flash";
@@ -14,10 +13,13 @@ import cors from "cors";
 import routes from "./routes/index.js";
 import "./lib/passport.js";
 import * as helpers from "./lib/handlebars.js";
-import { SECRET, database } from "./config.js";
+import { SECRET} from "./config.js";
 import { pool } from "./database.js";
 import csurf from "csurf";
+import dotenv from 'dotenv';
 
+
+dotenv.config();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MySQLStore = expressMySQLSession(session);
@@ -38,48 +40,82 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: "http://localhost:4000", // Allow only the specified origin
+  origin: ["http://localhost:4000", "https://accounts.google.com"], // Allow only the specified origin
   methods: "GET,PUT,POST,DELETE",
-  allowedHeaders: "Content-Type, Authorization, X-CSRF-Token",
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token','Set-Cookie', 'Cookie'],
   credentials: true,
 };
+app.use(cors(corsOptions));
+
 // Set CSP using helmet
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
+
+      // Allow scripts from self, jsDelivr CDN, and Google for OAuth
       scriptSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net", // Allow JS from jsdelivr CDN
+        "https://cdn.jsdelivr.net",  // Allow JS from jsdelivr CDN
+        "https://accounts.google.com",  // Google OAuth login
+        "https://apis.google.com",  // Google API scripts
       ],
+
+      // Allow styles from self, jsDelivr, FontAwesome, and Google Fonts
       styleSrc: [
         "'self'",
-        "https://cdn.jsdelivr.net", // Allow CSS from jsdelivr CDN (Bootstrap)
-        "https://use.fontawesome.com", // Allow CSS from FontAwesome
-        "https://fonts.googleapis.com", // Allow CSS from Google Fonts
+        "https://cdn.jsdelivr.net",  // Bootstrap
+        "https://use.fontawesome.com",  // FontAwesome CSS
+        "https://fonts.googleapis.com",  // Google Fonts
       ],
+
+      // Allow fonts from self, Google Fonts, and FontAwesome
       fontSrc: [
         "'self'",
-        "https://fonts.gstatic.com", // Allow fonts from Google Fonts
-        "https://use.fontawesome.com", // Allow fonts from FontAwesome
+        "https://fonts.gstatic.com",  // Google Fonts
+        "https://use.fontawesome.com",  // FontAwesome
       ],
-      imgSrc: ["'self'", "data:"], // Allow images from 'self' and data URIs
-      connectSrc: ["'self'"],
+
+      // Allow images from self and Google (e.g., Google logos)
+      imgSrc: [
+        "'self'",
+        "data:",  // Allow base64-encoded images
+        "https://www.gstatic.com",  // Google OAuth images
+      ],
+
+      // Allow connections to self and Google for OAuth and API requests
+      connectSrc: [
+        "'self'",
+        "https://accounts.google.com",  // Google OAuth
+        "https://www.googleapis.com",  // Google APIs
+      ],
+
+      // Disallow embedding external objects
       objectSrc: ["'none'"],
-      upgradeInsecureRequests: [true],// Automatically upgrade HTTP to HTTPS
+
+      // Automatically upgrade HTTP to HTTPS
+      upgradeInsecureRequests: [],
+
+      // Allow frame sources for Google OAuth iframes
+      frameSrc: [
+        "https://accounts.google.com",  // Google OAuth login popup
+      ],
     },
-    reportOnly: false, // Set to false to enforce the policy
+    reportOnly: false,  // Enforce the policy
   })
 );
 
+
 // Set HSTS with helmet (Strict-Transport-Security)
-app.use(
-  helmet.hsts({
-    maxAge: 31536000, // 1 year in seconds
-    includeSubDomains: true, // Apply to all subdomains
-    preload: true, // Allow domain to be preloaded by browsers
-  })
-);
+if (process.env.NODE_ENV === 'production') {
+  app.use(
+    helmet.hsts({
+      maxAge: 31536000, // 1 year
+      includeSubDomains: true,
+      preload: true,
+    })
+  );
+}
 
 
 // Middleware configuration
@@ -91,15 +127,15 @@ app.use(cookieParser("faztmysqlnodemysql"));
 // Session middleware
 app.use(
   session({
-    secret: SECRET,
+    secret: process.env.SECRET || 'some secret key',
     resave: false,
     saveUninitialized: false,
     store: new MySQLStore({}, pool),
     cookie: {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      maxAge: 1000 * 60 * 60 * 24, // 1 day
-      sameSite: 'strict'// SameSite attribute added for CSRF cookie
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: 'lax'// SameSite attribute added for CSRF cookie
     },
   })
 );
@@ -109,7 +145,7 @@ const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', // Set to true in production
-    sameSite: 'strict',  // SameSite attribute added for CSRF cookie
+    sameSite: 'lax',  // SameSite attribute added for CSRF cookie
   },
 });
 app.use(csrfProtection);
@@ -120,8 +156,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Security middleware
-app.use(cors(corsOptions));
 
 // Passport initialization
 app.use(passport.initialize());

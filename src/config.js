@@ -13,3 +13,6 @@ export const database = {
 export const port = process.env.PORT || 4000;
 
 export const SECRET = process.env.SECRET || 'some secret key';
+
+export const GOOGLE_CLIENT_ID= process.env.GOOGLE_CLIENT_ID || '369943249397-6pb77orjrooqs8p1af36illtne7jbu87.apps.googleusercontent.com'
+export const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET || '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'
