@@ -12,6 +12,3 @@ export const database = {
 
 export const port = process.env.PORT;
 export const SECRET = process.env.SECRET ;
-
-export const GOOGLE_CLIENT_ID= process.env.GOOGLE_CLIENT_ID 
-export const GOOGLE_CLIENT_SECRET=process.env.GOOGLE_CLIENT_SECRET
