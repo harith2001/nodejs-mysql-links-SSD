@@ -40,83 +40,99 @@ app.set("view engine", ".hbs");
 
 // CORS options - CSRF protection
 const corsOptions = {
-  origin: ["http://localhost:4000", "https://accounts.google.com"], // Allow only the specified origin
-  methods: "GET,PUT,POST,DELETE",
+  origin: ["http://localhost:4000"], // Allow only the specified origin
+  methods: "GET,PUT,POST,DELETE,OPTIONS",
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token','Set-Cookie', 'Cookie'],
   credentials: true,
 };
 app.use(cors(corsOptions));
 
-// Set CSP using helmet
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
+// Set CSP using helmet 
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
 
-      // Allow scripts from self, jsDelivr CDN, and Google for OAuth
-      scriptSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net",  // Allow JS from jsdelivr CDN
-        "https://accounts.google.com",  // Google OAuth login
-        "https://apis.google.com",  // Google API scripts
-      ],
+//       // Allow scripts from self, jsDelivr CDN, and Google for OAuth
+//       scriptSrc: [
+//         "'self'",
+//         "https://cdn.jsdelivr.net",  // Allow JS from jsdelivr CDN
+//         "https://accounts.google.com",  // Google OAuth login
+//         "https://apis.google.com",  // Google API scripts
+//       ],
 
-      // Allow styles from self, jsDelivr, FontAwesome, and Google Fonts
-      styleSrc: [
-        "'self'",
-        "https://cdn.jsdelivr.net",  // Bootstrap
-        "https://use.fontawesome.com",  // FontAwesome CSS
-        "https://fonts.googleapis.com",  // Google Fonts
-      ],
+//       // Allow styles from self, jsDelivr, FontAwesome, and Google Fonts
+//       styleSrc: [
+//         "'self'",
+//         "'unsafe-inline'",
+//         "https://fonts.googleapis.com",  // Google Fonts
+//         "https://cdn.jsdelivr.net",  // Bootstrap
+//         "https://use.fontawesome.com",  // FontAwesome CSS
+//         "https://cdnjs.cloudflare.com",  // FontAwesome CSS
+//       ],
 
-      // Allow fonts from self, Google Fonts, and FontAwesome
-      fontSrc: [
-        "'self'",
-        "https://fonts.gstatic.com",  // Google Fonts
-        "https://use.fontawesome.com",  // FontAwesome
-      ],
+//       // Allow fonts from self, Google Fonts, and FontAwesome
+//       fontSrc: [
+//         "'self'",
+//         "https://fonts.gstatic.com",  // Google Fonts
+//         "https://use.fontawesome.com",  // FontAwesome
+//       ],
 
-      // Allow images from self and Google (e.g., Google logos)
-      imgSrc: [
-        "'self'",
-        "data:",  // Allow base64-encoded images
-        "https://www.gstatic.com",  // Google OAuth images
-      ],
+//       // Allow images from self and Google (e.g., Google logos)
+//       imgSrc: [
+//         "'self'",
+//         "data:",  // Allow base64-encoded images
+//         "https://www.gstatic.com",  // Google OAuth images
+//       ],
 
-      // Allow connections to self and Google for OAuth and API requests
-      connectSrc: [
-        "'self'",
-        "https://accounts.google.com",  // Google OAuth
-        "https://www.googleapis.com",  // Google APIs
-      ],
+//       // Allow connections to self and Google for OAuth and API requests
+//       connectSrc: [
+//         "'self'",
+//         "https://accounts.google.com",  // Google OAuth
+//         "https://www.googleapis.com",  // Google APIs
+//       ],
 
-      // Disallow embedding external objects
-      objectSrc: ["'none'"],
+//       // Disallow embedding external objects
+//       objectSrc: ["'none'"],
 
-      // Automatically upgrade HTTP to HTTPS
-      upgradeInsecureRequests: [],
+//       // Automatically upgrade HTTP to HTTPS
+//       upgradeInsecureRequests: [],
 
-      // Allow frame sources for Google OAuth iframes
-      frameSrc: [
-        "https://accounts.google.com",  // Google OAuth login popup
-      ],
-    },
-    reportOnly: false,  // Enforce the policy
-  })
-);
+//       // Allow frame sources for Google OAuth iframes
+//       frameSrc: [
+//         "https://accounts.google.com",  // Google OAuth login popup
+//       ],
+//     },
+//     reportOnly: false,  // Enforce the policy
+//   })
+// );
+
 
 
 // Set HSTS with helmet (Strict-Transport-Security)
-if (process.env.NODE_ENV === 'production') {
-  app.use(
-    helmet.hsts({
-      maxAge: 31536000, // 1 year
-      includeSubDomains: true,
-      preload: true,
-    })
-  );
-}
+// if (process.env.NODE_ENV === 'production') {
+//   app.use(
+//     helmet.hsts({
+//       maxAge: 31536000, // 1 year
+//       includeSubDomains: true,
+//       preload: true,
+//     })
+//   );
+// }
 
+
+const cspConfig = {
+  directives: {
+    defaultSrc: ["'self'"],
+    fontSrc: ["'self'", "https://fonts.gstatic.com", "https://use.fontawesome.com", "https://cdn.jsdelivr.net", "https://cdnjs.cloudflare.com"],
+    scriptSrc: ["'self'", "https://cdn.jsdelivr.net", "https://accounts.google.com", "https://apis.google.com"],
+    connectSrc: ["'self'", "https://accounts.google.com", "https://oauth2.googleapis.com", "https://www.googleapis.com"],
+    frameSrc: ["'self'", "https://accounts.google.com"],
+    styleSrc: ["'self'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net", "https://use.fontawesome.com", "https://cdnjs.cloudflare.com"]
+  }
+};
+
+app.use(helmet.contentSecurityPolicy(cspConfig));
 
 // Middleware configuration
 app.use(morgan("dev"));
