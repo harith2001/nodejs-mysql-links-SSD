@@ -162,15 +162,13 @@ passport.use(
 
 // Serialize the user to store in session
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Store only the user's ID in the sessiom
+  done(null, user.id); // Store only the user's ID in the session
 });
 
 // Deserialize the user based on the ID stored in the session
 passport.deserializeUser(async(id, done) => {
-  console.log("Deserializing user with id:", id);
   try {
     const [rows] =await pool.query("SELECT * FROM users WHERE id = ?", [id]);
-    console.log("Deserialized user:", rows[0]);
     done(null, rows[0]); // Return the full user object
   } catch (err) {
     done(err, null);

@@ -23,19 +23,13 @@ router.post("/signin", validator(signinSchema), signIn);
 
 // Google OAuth - Login
 router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-// Google OAuth - Callback
-// router.get("/auth/google/callback",passport.authenticate("google",{ failureRedirect: "/signin" }),googleCallback);
+;
 router.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/sigin' }),
   (req, res) => {
     res.redirect('/links');
   }
 );
-// router.get("/auth/google/callback",passport.authenticate("google"),
-//   (req, res) => {
-//     res.redirect("/links");
-//   });
 
 // Logout
 router.get("/logout", logout);
