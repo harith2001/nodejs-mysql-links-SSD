@@ -42,12 +42,6 @@ export const signIn = passport.authenticate("local.signin", {
   failureFlash: true,
 });
 
-// Handle Google OAuth Login 
-export const googleCallback = (req, res) => {
-  console.log("Google OAuth login successful, redirecting...", req.session);
-  res.redirect("/links"); 
-};
-
 //logout
 export const logout = (req, res, next) => {
   req.logout(function (err) {

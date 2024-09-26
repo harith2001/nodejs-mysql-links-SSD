@@ -1,36 +1,46 @@
-# Notes App with Nodejs and Mysql (Vulnerabilities solved)
+# Favourite Links App with Nodejs and Mysql (Vulnerabilities solved)
 
 Black-Box Testing Tool :- Owasp tool
 white-Box Testing Tool :- ESLint tool
 
-# Team Details - Software Secure Development 
+# Team Details - Software Secure Development - SE4030
 
 Vithanage H.D - IT21308284
 Dehipola H.M.S.N - IT21291678
 
-Notes App is a Multi Page Application using Nodejs and Mysql. The purpose of this web application is just to be an example for beginners.
+Favourite Links App is a Multi Page Application using Nodejs and Mysql. The purpose of this web application is just to be an example for beginners. save the links of the useful websites.
 
 ![](docs/screenshot2.png)
 ![](docs/screenshot.png)
 
 ### Installation with Docker (Recommended)
 
+# Steps of Installation 
 ```
-git clone https://github.com/FaztTech/nodejs-mysql-links
-cd nodejs-mysql-links
-docker-compose up
+1. git clone https://github.com/FaztTech/nodejs-mysql-links
+2. cd nodejs-mysql-links
+3. docker-compose up
+4. npm i
+5. npm run dev
 ```
+Note : If your using docker to start the mysql stop the mysql sever.
 
 Now you can visit http://localhost:4000
 
 ### Manual Installation
 
 ```
-mysql -u MYUSR "-pMYPASSWORD" < ./database/db.sql # create database
-npm i
-npm run build
-npm start
+1. mysql -u MYUSR "-pMYPASSWORD" < ./database/db.sql # create database
+2. npm i
+3. npm run build
+4. npm run dev
 ```
+
+# New Addition 
+
+1. Most of vulnerabilities fixed 
+2. Google Oauth implemented for easy access 
+
 
 ## File Structure
 
@@ -64,4 +74,5 @@ npm start
 
 # Orginal Author 
 Fazt - https://github.com/fazt
+
 repo - https://github.com/fazt/nodejs-mysql-links 

@@ -4,8 +4,7 @@ import {
   signUp,
   renderSignIn,
   signIn,
-  logout,
-  googleCallback,
+  logout
 } from "../controllers/auth.controller.js";
 import { validator } from "../middlewares/validator.middleware.js";
 import { signinSchema, signupSchema } from "../schemas/auth.schema.js";
