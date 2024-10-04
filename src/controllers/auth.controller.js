@@ -46,6 +46,8 @@ export const signIn = passport.authenticate("local.signin", {
 export const logout = (req, res, next) => {
   req.logout(function (err) {
     if (err) return next(err);
-    res.redirect("/");
+    //clear the google session 
+    const googleLogoutUrl = "https://www.google.com/accounts/Logout?continue=https://appengine.google.com/_ah/logout?continue=http://localhost:4000/"; ;
+    res.redirect(googleLogoutUrl);
   });
 };
