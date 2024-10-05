@@ -37,10 +37,11 @@ app.set("view engine", ".hbs");
 
 //CORS options - CSRF protection
 const corsOptions = {
-  origin: ["http://localhost:4000",              
-    "https://fonts.googleapis.com",            
-    "https://fonts.gstatic.com",               
-    "https://cdnjs.cloudflare.com"        ],
+  origin: ["http://localhost:4000",
+    "https://cdn.jsdelivr.net",
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+    "https://use.fontawesome.com"], //allow only the specified origin
   methods: "GET,PUT,POST,DELETE,OPTIONS",
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token','Set-Cookie', 'Cookie'],
   credentials: true,
@@ -70,7 +71,9 @@ if (process.env.NODE_ENV === 'production') {
   );
 }
 
-app.use(helmet.contentSecurityPolicy(cspConfig));
+app.use(helmet.hidePoweredBy());  //hide X-Powered-By
+app.use(helmet.noSniff());        //x-Content-Type-Options: nosniff
+app.use(helmet.contentSecurityPolicy(cspConfig)); //CSP
 
 //middleware configuration
 app.use(morgan("dev"));
