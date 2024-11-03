@@ -9,6 +9,7 @@ CREATE TABLE users (
   fullname VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL,
   password VARCHAR(60) NOT NULL,
+  google_id VARCHAR(255),
   created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 ) AUTO_INCREMENT=2;
