@@ -41,7 +41,7 @@ passport.use(
   )
 );
 
-// Google OAuth Strategy
+//google OAuth Strategy
 passport.use(
   new GoogleStrategy(
     {
@@ -79,16 +79,16 @@ passport.use(
   )
 );
 
-// Serialize the user to store in session
+//serialize the user to store in session
 passport.serializeUser((user, done) => {
-  done(null, user.id); // Store only the user's ID in the session
+  done(null, user.id); 
 });
 
-// Deserialize the user based on the ID stored in the session
+//deserialize the user based on the ID stored in the session
 passport.deserializeUser(async(id, done) => {
   try {
     const [rows] =await pool.query("SELECT * FROM users WHERE id = ?", [id]);
-    done(null, rows[0]); // Return the full user object
+    done(null, rows[0]); 
   } catch (err) {
     done(err, null);
   }

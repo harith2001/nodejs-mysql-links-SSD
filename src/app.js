@@ -17,13 +17,11 @@ import { pool } from "./database.js";
 import csurf from "csurf";
 import dotenv from 'dotenv';
 
-
 dotenv.config();
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MySQLStore = expressMySQLSession(session);
 
-// Set views and view engine
 app.set("views", path.join(__dirname, "views"));
 app.engine(
   ".hbs",
@@ -37,9 +35,13 @@ app.engine(
 );
 app.set("view engine", ".hbs");
 
-// CORS options - CSRF protection
+//CORS options - CSRF protection
 const corsOptions = {
-  origin: ["http://localhost:4000"],
+  origin: ["http://localhost:4000",
+    "https://cdn.jsdelivr.net",
+    "https://fonts.googleapis.com",
+    "https://fonts.gstatic.com",
+    "https://use.fontawesome.com"], //allow only the specified origin
   methods: "GET,PUT,POST,DELETE,OPTIONS",
   allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token','Set-Cookie', 'Cookie'],
   credentials: true,
@@ -58,7 +60,7 @@ const cspConfig = {
   }
 };
 
-// Set HSTS with helmet (Strict-Transport-Security)
+//set HSTS with helmet (Strict-Transport-Security)
 if (process.env.NODE_ENV === 'production') {
   app.use(
     helmet.hsts({
@@ -69,15 +71,17 @@ if (process.env.NODE_ENV === 'production') {
   );
 }
 
-app.use(helmet.contentSecurityPolicy(cspConfig));
+app.use(helmet.hidePoweredBy());  //hide X-Powered-By
+app.use(helmet.noSniff());        //x-Content-Type-Options: nosniff
+app.use(helmet.contentSecurityPolicy(cspConfig)); //CSP
 
-// Middleware configuration
+//middleware configuration
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser("faztmysqlnodemysql"));
 
-// Session middleware
+//session middleware
 app.use(
   session({
     secret: process.env.SECRET || 'some secret key',
@@ -88,39 +92,39 @@ app.use(
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      sameSite: 'lax'// SameSite attribute added for CSRF cookie
+      sameSite: 'lax'//SameSite attribute added for CSRF cookie
     },
   })
 );
 
-// CSRF Protection (must come after session middleware)
+//CSRF Protection
 const csrfProtection = csurf({
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production', 
-    sameSite: 'lax',  // SameSite attribute added for CSRF cookie
+    sameSite: 'lax',  //sameSite attribute added for CSRF cookie
   },
 });
 app.use(csrfProtection);
 
-// Middleware to set CSRF token in locals
+//middleware to set CSRF token in locals
 app.use((req, res, next) => {
   res.locals.csrfToken = req.csrfToken();
   next();
 });
 
 
-// Passport initialization
+
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Flash messages setup
+
 app.use(promiseConnectFlash());
 
-// Serve static files
+//serve static files
 app.use(express.static(path.join(__dirname, "public")));
 
-// Global variables middleware
+//global variables middleware
 app.use(async (req, res, next) => {
   res.locals.success = await req.getFlash("success");
   res.locals.error = await req.getFlash("error");
@@ -131,17 +135,15 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// Routes
+//routes
 app.use('/',routes);
 
-// 404 error handler
 app.use((next) => {
   const err = new Error("Not Found");
   err.status = 404;
   next(err);
 });
 
-// CSRF Error Handling
 app.use((err,res, next) => {
   if (err.code === 'EBADCSRFTOKEN') {
     res.status(403);
@@ -151,7 +153,6 @@ app.use((err,res, next) => {
   }
 });
 
-// General error handler
 app.use((err,res, next) => {
   console.log("Error", err);
   res.status(err.status || 500);

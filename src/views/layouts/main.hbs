@@ -1,49 +1,3 @@
-{{!-- <!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- CSRF Token -->
-  <meta name="csrf-token" content="{{csrfToken}}">
-
-  <meta http-equiv="Content-Security-Policy" content="style-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; font-src 'self'; connect-src 'self'; media-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'; block-all-mixed-content; upgrade-insecure-requests;">
-
-  <!-- Preload Google Fonts -->
-  <link rel="preload" href="https://fonts.googleapis.com/css?family=Oswald" as="style">
-  <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
-
-  <!-- Preload and Apply Bootstrap CSS -->
-  <link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" as="style">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Preload and Apply FontAwesome CSS -->
-  <link rel="preload" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" as="style" crossorigin="anonymous">
-  <link href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" rel="stylesheet"
-    integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
-
-  <!-- Preload and Apply Custom Styles -->
-  <link rel="preload" href="/css/styles.css" as="style">
-  <link href="/css/styles.css" rel="stylesheet">
-
-  <!-- google oauth -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
-
-</head>
-
-<body>
-  {{>navigation}}
-  {{>message}}
-  {{{ body }}}
-
-  <!-- Bootstrap JS Bundle (includes Popper.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
-    crossorigin="anonymous"></script>
-</body>
-
-</html> --}}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -61,23 +15,21 @@
     connect-src 'self' https://accounts.google.com https://oauth2.googleapis.com https://www.googleapis.com;  
     frame-src 'self' https://accounts.google.com;
     style-src 'self' https://fonts.googleapis.com https://cdn.jsdelivr.net https://use.fontawesome.com https://cdnjs.cloudflare.com;">
-
-
-
-  <!-- Preload Google Fonts -->
+    
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" as="style">
   <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
 
-  <!-- Preload and Apply Bootstrap CSS -->
+  <!-- Apply Bootstrap CSS -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" as="style">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Preload and Apply FontAwesome CSS -->
+  <!-- Apply FontAwesome CSS -->
   <link rel="preconnect" href="https://use.fontawesome.com" as="style" crossorigin="anonymous">
   <link href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" rel="stylesheet"
     integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 
-  <!-- Preload and Apply Custom Styles -->
+  <!-- Apply Custom Styles -->
   <link rel="preconnect" href="/css/styles.css" as="style">
   <link href="/css/styles.css" rel="stylesheet">
 
